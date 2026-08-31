@@ -1,0 +1,10 @@
+folder_id          = "<folder_id>"
+zone               = "ru-central1-a"
+project            = "future20"
+env                = "dev"
+corporate_cidr     = "<внешний_IP>/32"
+ssh_public_key     = "ssh-ed25519 ..."
+db_password        = "<пароль БД>"
+storage_access_key = "<key_id>"
+storage_secret_key = "<secret>"
+analytics_data_disk_size = 50

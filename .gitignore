@@ -1,0 +1,12 @@
+# Секреты и ключи (никогда не коммитим)
+key.json
+*.pem
+
+# Terraform: локальное состояние содержит секреты в открытом виде
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Служебное
+.DS_Store
