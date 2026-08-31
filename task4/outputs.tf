@@ -1,40 +1,36 @@
 output "portal_public_ip" {
-  description = "Публичный IP портала самообслуживания"
-  value       = aws_eip.portal.public_ip
+  value = yandex_vpc_address.portal.external_ipv4_address[0].address
 }
 
 output "vm_private_ips" {
-  description = "Приватные IP виртуальных машин"
   value = {
-    portal      = aws_instance.portal.private_ip
-    analytics   = aws_instance.analytics.private_ip
-    integration = aws_instance.integration.private_ip
+    portal      = yandex_compute_instance.portal.network_interface[0].ip_address
+    analytics   = yandex_compute_instance.analytics.network_interface[0].ip_address
+    integration = yandex_compute_instance.integration.network_interface[0].ip_address
   }
 }
 
-output "vpc_id" {
-  value = aws_vpc.main.id
+output "network_id" {
+  value = yandex_vpc_network.main.id
 }
 
 output "subnet_ids" {
   value = {
-    public_platform  = aws_subnet.public_platform.id
-    private_platform = aws_subnet.private_platform.id
-    clinics_a        = aws_subnet.clinics_a.id
-    clinics_b        = aws_subnet.clinics_b.id
-    fintech          = aws_subnet.fintech.id
-    ai               = aws_subnet.ai.id
+    platform = yandex_vpc_subnet.platform.id
+    clinics  = yandex_vpc_subnet.clinics.id
+    fintech  = yandex_vpc_subnet.fintech.id
+    ai       = yandex_vpc_subnet.ai.id
   }
 }
 
 output "nat_gateway_id" {
-  value = aws_nat_gateway.nat.id
+  value = yandex_vpc_gateway.nat.id
 }
 
 output "data_lake_bucket" {
-  value = aws_s3_bucket.lake.bucket
+  value = yandex_storage_bucket.lake.bucket
 }
 
-output "clinics_db_endpoint" {
-  value = aws_db_instance.clinics.endpoint
+output "clinics_db_host" {
+  value = yandex_mdb_postgresql_cluster.clinics.host[0].fqdn
 }

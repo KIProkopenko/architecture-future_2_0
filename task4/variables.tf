@@ -1,7 +1,12 @@
-variable "region" {
-  description = "Регион (для LocalStack любой, например us-east-1)"
+variable "folder_id" {
+  description = "ID каталога Yandex Cloud (yc config list)"
   type        = string
-  default     = "us-east-1"
+}
+
+variable "zone" {
+  description = "Зона доступности"
+  type        = string
+  default     = "ru-central1-a"
 }
 
 variable "project" {
@@ -11,19 +16,13 @@ variable "project" {
 }
 
 variable "env" {
-  description = "Окружение (dev / test / prod)"
+  description = "Окружение"
   type        = string
   default     = "dev"
 }
 
-variable "vpc_cidr" {
-  description = "CIDR всей VPC"
-  type        = string
-  default     = "10.0.0.0/16"
-}
-
 variable "corporate_cidr" {
-  description = "CIDR корпоративной сети для SSH"
+  description = "CIDR вашей сети для SSH (узнайте свой внешний IP, например на 2ip.ru, и добавьте /32)"
   type        = string
 }
 
@@ -33,60 +32,59 @@ variable "allowed_public_cidr" {
   default     = "0.0.0.0/0"
 }
 
-variable "ami_id" {
-  description = "AMI для ВМ (LocalStack не валидирует; для реального AWS подставьте актуальный Ubuntu 22.04)"
-  type        = string
-  default     = "ami-0c55b159cbfafe1f0"
+variable "vm_username" {
+  type    = string
+  default = "ubuntu"
 }
 
 variable "ssh_public_key" {
-  description = "Публичный SSH-ключ для доступа к ВМ"
+  description = "Публичный SSH-ключ (cat ~/.ssh/id_ed25519.pub)"
   type        = string
   sensitive   = true
 }
 
 variable "db_password" {
-  description = "Пароль администратора БД клиник"
+  description = "Пароль пользователя БД клиник"
+  type        = string
+  sensitive   = true
+}
+
+variable "storage_access_key" {
+  description = "Статический ключ доступа к Object Storage"
+  type        = string
+  sensitive   = true
+}
+
+variable "storage_secret_key" {
+  description = "Секретный ключ Object Storage"
   type        = string
   sensitive   = true
 }
 
 variable "boot_disk_size" {
-  description = "Размер загрузочного диска, ГБ"
-  type        = number
-  default     = 30
+  type    = number
+  default = 30
 }
 
 variable "portal_data_disk_size" {
-  description = "Диск данных портала, ГБ"
-  type        = number
-  default     = 50
+  type    = number
+  default = 50
 }
 
 variable "analytics_data_disk_size" {
-  description = "Диск данных аналитики, ГБ"
-  type        = number
-  default     = 200
+  type    = number
+  default = 200
 }
 
-variable "instance_types" {
-  description = "Типы инстансов по ролям (c5.xlarge = 4 vCPU/8 ГБ, c5.2xlarge = 8 vCPU/16 ГБ)"
-  type        = map(string)
+variable "vm_sizes" {
+  description = "Размеры ВМ: portal 4/8, analytics 8/16, integration 4/8"
+  type = map(object({
+    cores  = number
+    memory = number
+  }))
   default = {
-    portal      = "c5.xlarge"
-    analytics   = "c5.2xlarge"
-    integration = "c5.xlarge"
+    portal      = { cores = 4, memory = 8 }
+    analytics   = { cores = 8, memory = 16 }
+    integration = { cores = 4, memory = 8 }
   }
-}
-
-variable "db_instance_class" {
-  description = "Класс инстанса RDS"
-  type        = string
-  default     = "db.t3.micro"
-}
-
-variable "db_storage_gb" {
-  description = "Объём диска RDS, ГБ"
-  type        = number
-  default     = 20
 }

@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Error><Code>NoSuchBucket</Code><Message>The specified bucket does not exist.</Message><Resource>/terraform-provider/terraform-provider-yande</Resource><RequestId>df97506f98b9a3ec</RequestId></Error>
