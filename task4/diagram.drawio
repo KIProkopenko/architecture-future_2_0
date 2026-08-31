@@ -1,0 +1,531 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="oO2gKgp4PxxgaLD2oYF1">
+    <mxGraphModel dx="5320" dy="2813" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&#xa;  &quot;data&quot;: &quot;flowchart LR\n    classDef ext fill:#fce7f3,stroke:#9d174d,stroke-width:2px;\n    classDef proc fill:#dbeafe,stroke:#1e40af,stroke-width:2px;\n    classDef store fill:#fef3c7,stroke:#b45309,stroke-width:2px;\n    classDef portal fill:#dcfce7,stroke:#15803d,stroke-width:2px;\n\n    PAT([\&quot;Пациенты\&quot;]):::ext\n    DOC([\&quot;Врачи\&quot;]):::ext\n    CLI([\&quot;Клиенты банка\&quot;]):::ext\n    USR([\&quot;Бизнес-пользователи и менеджмент\&quot;]):::ext\n    REG([\&quot;Регуляторы\&quot;]):::ext\n    PH([\&quot;Фармкомпании (будущее)\&quot;]):::ext\n    EL([\&quot;Медэлектроника (будущее)\&quot;]):::ext\n\n    subgraph CLIN[\&quot;Домен «Клиники»\&quot;]\n        P11((\&quot;1.1 МИС: приёмы и лечение\&quot;)):::proc\n        S1[(\&quot;Хранилище медданных (медкарты, шифрование)\&quot;)]:::store\n        P12((\&quot;1.2 Анонимизация\&quot;)):::proc\n    end\n\n    subgraph AID[\&quot;Домен «ИИ-сервисы»\&quot;]\n        P21((\&quot;2.1 Обучение моделей\&quot;)):::proc\n        S2[(\&quot;Хранилище признаков (анонимизированные данные)\&quot;)]:::store\n        P22((\&quot;2.2 Инференс: поддержка диагноза\&quot;)):::proc\n    end\n\n    subgraph FIN[\&quot;Домен «Финтех» (банк)\&quot;]\n        P31((\&quot;3.1 Финтех-сервисы: счета, кредиты, платежи\&quot;)):::proc\n        S3[(\&quot;Банковская БД\&quot;)]:::store\n        P32((\&quot;3.2 Риски и антифрод\&quot;)):::proc\n    end\n\n    subgraph HQ[\&quot;Домен «Головной офис»\&quot;]\n        P41((\&quot;4.1 ERP / HR / Инвентаризация\&quot;)):::proc\n        P42((\&quot;4.2 Консолидированная отчётность\&quot;)):::proc\n    end\n\n    subgraph PART[\&quot;Домен «Партнёрская экосистема» (будущее)\&quot;]\n        P51((\&quot;5.1 Стандартный партнёрский коннектор\&quot;)):::proc\n    end\n\n    subgraph PLAT[\&quot;Общая платформа данных (без бизнес-логики)\&quot;]\n        GW((\&quot;API-шлюз\&quot;)):::proc\n        BUS((\&quot;Шина данных Kafka: события и CDC\&quot;)):::proc\n        S6[(\&quot;Озеро данных Bronze\&quot;)]:::store\n        P62((\&quot;6.2 Трансформации Silver\&quot;)):::proc\n        S7[(\&quot;Доменные витрины Gold\&quot;)]:::store\n        P63((\&quot;6.3 Семантический слой: метрики\&quot;)):::proc\n        P71((\&quot;7.1 Портал самообслуживания «витрина данных»\&quot;)):::portal\n        S8[(\&quot;Каталог данных + IAM (RBAC/ABAC)\&quot;)]:::store\n    end\n\n    DOC --&gt;|\&quot;данные приёмов\&quot;| P11\n    PAT --&gt;|\&quot;согласия, мастер-данные\&quot;| P11\n    P11 &lt;--&gt;|\&quot;чтение/запись\&quot;| S1\n    S1 --&gt;|\&quot;медданные\&quot;| P12\n    P12 --&gt;|\&quot;анонимизированные события (без врачебной тайны)\&quot;| BUS\n\n    CLI --&gt;|\&quot;платежи, кредитные заявки\&quot;| P31\n    P31 &lt;--&gt;|\&quot;чтение/запись\&quot;| S3\n    S3 --&gt;|\&quot;финансовые события, CDC\&quot;| BUS\n    S3 --&gt;|\&quot;транзакции\&quot;| P32\n    P32 --&gt;|\&quot;оценка риска\&quot;| P31\n\n    P41 --&gt;|\&quot;HR, инвентаризация, финотчётность\&quot;| BUS\n\n    PH --&gt;|\&quot;НСИ препаратов, продажи\&quot;| P51\n    EL --&gt;|\&quot;телеметрия устройств\&quot;| P51\n    P51 --&gt;|\&quot;события в стандартном формате\&quot;| BUS\n\n    BUS --&gt;|\&quot;сырые данные\&quot;| S6\n    S6 --&gt; P62\n    P62 --&gt;|\&quot;курируемые данные\&quot;| S7\n    S7 --&gt; P63\n    P63 --&gt;|\&quot;метрики\&quot;| P71\n    USR --&gt;|\&quot;запрос отчётов в пределах доступа\&quot;| P71\n    S8 -.-&gt;|\&quot;авторизация, маскирование, аудит\&quot;| P71\n    P62 -.-&gt;|\&quot;lineage, качество данных\&quot;| S8\n\n    S6 --&gt;|\&quot;анонимизированные данные для ИИ\&quot;| P21\n    P21 --&gt; S2\n    S2 --&gt; P22\n    P22 --&gt;|\&quot;результаты инференса\&quot;| GW\n    GW --&gt;|\&quot;ИИ-поддержка диагноза\&quot;| P11\n\n    P31 &lt;--&gt;|\&quot;API-контракты, напр. «кредит на лечение»\&quot;| GW\n    GW &lt;--&gt;|\&quot;операционные API\&quot;| P41\n\n    S7 --&gt;|\&quot;витрины для консолидации\&quot;| P42\n    P42 --&gt;|\&quot;регуляторные отчёты\&quot;| REG&quot;,&#xa;  &quot;config&quot;: null&#xa;}" id="oGepzP1wyrvSItz7kdB5-1">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=10;" vertex="1">
+            <mxGeometry as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Домен «Клиники»" mermaidId="n:CLIN" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Домен «Клиники»" id="oGepzP1wyrvSItz7kdB5-2">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="366" width="1494" x="309" y="921" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="1.1 МИС: приёмы и лечение" mermaidId="n:P11" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="1.1 МИС: приёмы и лечение" id="oGepzP1wyrvSItz7kdB5-3">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-2" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="239" width="239" x="35" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Хранилище медданных (медкарты, шифрование)" mermaidId="n:S1" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Хранилище медданных (медкарты, шифрование)" id="oGepzP1wyrvSItz7kdB5-4">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-2" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="383" x="553" y="224" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="1.2 Анонимизация" mermaidId="n:P12" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="1.2 Анонимизация" id="oGepzP1wyrvSItz7kdB5-5">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-2" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="166" width="166" x="1293" y="175" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="чтение/запись" mermaidId="e:P11-&gt;S1#0" mermaidBaseStyle="curved=1;startArrow=block;startSize=7;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.69;entryX=0;entryY=0.51;" mermaidBaseValue="чтение/запись" id="oGepzP1wyrvSItz7kdB5-6">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-2" source="oGepzP1wyrvSItz7kdB5-3" style="curved=1;startArrow=block;startSize=7;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.69;entryX=0;entryY=0.51;rounded=0;" target="oGepzP1wyrvSItz7kdB5-4">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="401" y="258" />
+                <mxPoint x="528" y="258" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="медданные" mermaidId="e:S1-&gt;P12#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.5;" mermaidBaseValue="медданные" id="oGepzP1wyrvSItz7kdB5-7">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-2" source="oGepzP1wyrvSItz7kdB5-4" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.5;rounded=0;" target="oGepzP1wyrvSItz7kdB5-5">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Домен «ИИ-сервисы»" mermaidId="n:AID" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Домен «ИИ-сервисы»" id="oGepzP1wyrvSItz7kdB5-8">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="364" width="1238" x="3379" y="1463" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="2.1 Обучение моделей" mermaidId="n:P21" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="2.1 Обучение моделей" id="oGepzP1wyrvSItz7kdB5-9">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-8" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="199" width="199" x="35" y="93" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Хранилище признаков (анонимизированные данные)" mermaidId="n:S2" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Хранилище признаков (анонимизированные данные)" id="oGepzP1wyrvSItz7kdB5-10">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-8" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="412" x="446" y="159" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="2.2 Инференс: поддержка диагноза" mermaidId="n:P22" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="2.2 Инференс: поддержка диагноза" id="oGepzP1wyrvSItz7kdB5-11">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-8" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="294" width="294" x="909" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:P21-&gt;S2#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.49;" mermaidBaseValue="" id="oGepzP1wyrvSItz7kdB5-12">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-8" source="oGepzP1wyrvSItz7kdB5-9" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.49;rounded=0;" target="oGepzP1wyrvSItz7kdB5-10">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:S2-&gt;P22#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.49;entryX=0;entryY=0.5;" mermaidBaseValue="" id="oGepzP1wyrvSItz7kdB5-13">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-8" source="oGepzP1wyrvSItz7kdB5-10" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.49;entryX=0;entryY=0.5;rounded=0;" target="oGepzP1wyrvSItz7kdB5-11">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Домен «Финтех» (банк)" mermaidId="n:FIN" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Домен «Финтех» (банк)" id="oGepzP1wyrvSItz7kdB5-14">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="468" width="1793" x="834" y="1381" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="3.1 Финтех-сервисы: счета, кредиты, платежи" mermaidId="n:P31" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="3.1 Финтех-сервисы: счета, кредиты, платежи" id="oGepzP1wyrvSItz7kdB5-15">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-14" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="369" width="369" x="35" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Банковская БД" mermaidId="n:S3" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Банковская БД" id="oGepzP1wyrvSItz7kdB5-16">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-14" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="126" x="788" y="221" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="3.2 Риски и антифрод" mermaidId="n:P32" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="3.2 Риски и антифрод" id="oGepzP1wyrvSItz7kdB5-17">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-14" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="192" width="192" x="1566" y="251" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="чтение/запись" mermaidId="e:P31-&gt;S3#0" mermaidBaseStyle="curved=1;startArrow=block;startSize=7;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.54;entryX=0;entryY=0.49;" mermaidBaseValue="чтение/запись" id="oGepzP1wyrvSItz7kdB5-18">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-14" source="oGepzP1wyrvSItz7kdB5-15" style="curved=1;startArrow=block;startSize=7;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.54;entryX=0;entryY=0.49;rounded=0;" target="oGepzP1wyrvSItz7kdB5-16">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="535" y="254" />
+                <mxPoint x="659" y="254" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="транзакции" mermaidId="e:S3-&gt;P32#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.85;exitY=1;entryX=0;entryY=0.65;" mermaidBaseValue="транзакции" id="oGepzP1wyrvSItz7kdB5-19">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-14" source="oGepzP1wyrvSItz7kdB5-16" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.85;exitY=1;entryX=0;entryY=0.65;rounded=0;" target="oGepzP1wyrvSItz7kdB5-17">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1042" y="398" />
+                <mxPoint x="1264" y="398" />
+                <mxPoint x="1486" y="398" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="оценка риска" mermaidId="e:P32-&gt;P31#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0;exitY=0.46;entryX=1;entryY=0.66;" mermaidBaseValue="оценка риска" id="oGepzP1wyrvSItz7kdB5-20">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-14" source="oGepzP1wyrvSItz7kdB5-17" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0;exitY=0.46;entryX=1;entryY=0.66;rounded=0;" target="oGepzP1wyrvSItz7kdB5-15">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1486" y="332" />
+                <mxPoint x="1264" y="332" />
+                <mxPoint x="1042" y="332" />
+                <mxPoint x="851" y="332" />
+                <mxPoint x="659" y="332" />
+                <mxPoint x="535" y="332" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Домен «Головной офис»" mermaidId="n:HQ" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Домен «Головной офис»" id="oGepzP1wyrvSItz7kdB5-21">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="934" width="364" x="5527" y="30" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="4.1 ERP / HR / Инвентаризация" mermaidId="n:P41" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="4.1 ERP / HR / Инвентаризация" id="oGepzP1wyrvSItz7kdB5-22">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-21" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="262" width="262" x="51" y="647" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="4.2 Консолидированная отчётность" mermaidId="n:P42" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="4.2 Консолидированная отчётность" id="oGepzP1wyrvSItz7kdB5-23">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-21" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="294" width="294" x="35" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Домен «Партнёрская экосистема» (будущее)" mermaidId="n:PART" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Домен «Партнёрская экосистема» (будущее)" id="oGepzP1wyrvSItz7kdB5-24">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="403" width="403" x="1483" y="382" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="5.1 Стандартный партнёрский коннектор" mermaidId="n:P51" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="5.1 Стандартный партнёрский коннектор" id="oGepzP1wyrvSItz7kdB5-25">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-24" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="333" width="333" x="35" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Общая платформа данных (без бизнес-логики)" mermaidId="n:PLAT" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Общая платформа данных (без бизнес-логики)" id="oGepzP1wyrvSItz7kdB5-26">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="958" width="3047" x="2310" y="396" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="API-шлюз" mermaidId="n:GW" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="API-шлюз" id="oGepzP1wyrvSItz7kdB5-27">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-26" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="103" width="103" x="2760" y="690" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Шина данных Kafka: события и CDC" mermaidId="n:BUS" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Шина данных Kafka: события и CDC" id="oGepzP1wyrvSItz7kdB5-28">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-26" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="301" width="301" x="35" y="632" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Озеро данных Bronze" mermaidId="n:S6" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Озеро данных Bronze" id="oGepzP1wyrvSItz7kdB5-29">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-26" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="176" x="523" y="749" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="6.2 Трансформации Silver" mermaidId="n:P62" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="6.2 Трансформации Silver" id="oGepzP1wyrvSItz7kdB5-30">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-26" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="223" width="223" x="1092" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Доменные витрины Gold" mermaidId="n:S7" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Доменные витрины Gold" id="oGepzP1wyrvSItz7kdB5-31">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-26" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="199" x="1622" y="84" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="6.3 Семантический слой: метрики" mermaidId="n:P63" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="6.3 Семантический слой: метрики" id="oGepzP1wyrvSItz7kdB5-32">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-26" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dbeafe;strokeColor=#1e40af;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="281" width="281" x="1984" y="279" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="7.1 Портал самообслуживания «витрина данных»" mermaidId="n:P71" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dcfce7;strokeColor=#15803d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="7.1 Портал самообслуживания «витрина данных»" id="oGepzP1wyrvSItz7kdB5-33">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-26" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#dcfce7;strokeColor=#15803d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="401" width="401" x="2611" y="132" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Каталог данных + IAM (RBAC/ABAC)" mermaidId="n:S8" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Каталог данных + IAM (RBAC/ABAC)" id="oGepzP1wyrvSItz7kdB5-34">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-26" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#fef3c7;strokeColor=#b45309;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="287" x="1981" y="162" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="сырые данные" mermaidId="e:BUS-&gt;S6#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.51;" mermaidBaseValue="сырые данные" id="oGepzP1wyrvSItz7kdB5-35">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-26" source="oGepzP1wyrvSItz7kdB5-28" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.51;rounded=0;" target="oGepzP1wyrvSItz7kdB5-29">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:S6-&gt;P62#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.59;exitY=0;entryX=0;entryY=0.5;" mermaidBaseValue="" id="oGepzP1wyrvSItz7kdB5-36">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-26" source="oGepzP1wyrvSItz7kdB5-29" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.59;exitY=0;entryX=0;entryY=0.5;rounded=0;" target="oGepzP1wyrvSItz7kdB5-30">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="884" y="156" />
+                <mxPoint x="1067" y="156" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="курируемые данные" mermaidId="e:P62-&gt;S7#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.4;entryX=0;entryY=0.49;" mermaidBaseValue="курируемые данные" id="oGepzP1wyrvSItz7kdB5-37">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-26" source="oGepzP1wyrvSItz7kdB5-30" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.4;entryX=0;entryY=0.49;rounded=0;" target="oGepzP1wyrvSItz7kdB5-31">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1415" y="117" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:S7-&gt;P63#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.63;exitY=1;entryX=0;entryY=0.5;" mermaidBaseValue="" id="oGepzP1wyrvSItz7kdB5-38">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-26" source="oGepzP1wyrvSItz7kdB5-31" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.63;exitY=1;entryX=0;entryY=0.5;rounded=0;" target="oGepzP1wyrvSItz7kdB5-32">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1952" y="419" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="метрики" mermaidId="e:P63-&gt;P71#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.62;" mermaidBaseValue="метрики" id="oGepzP1wyrvSItz7kdB5-39">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-26" source="oGepzP1wyrvSItz7kdB5-32" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.62;rounded=0;" target="oGepzP1wyrvSItz7kdB5-33">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="2297" y="419" />
+                <mxPoint x="2454" y="419" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="авторизация, маскирование, аудит" mermaidId="e:S8-&gt;P71#0" mermaidBaseStyle="curved=1;dashed=1;dashPattern=2 3;fixDash=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.49;entryX=0;entryY=0.31;" mermaidBaseValue="авторизация, маскирование, аудит" id="oGepzP1wyrvSItz7kdB5-40">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-26" source="oGepzP1wyrvSItz7kdB5-34" style="curved=1;dashed=1;dashPattern=2 3;fixDash=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.49;entryX=0;entryY=0.31;rounded=0;" target="oGepzP1wyrvSItz7kdB5-33">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="2297" y="195" />
+                <mxPoint x="2454" y="195" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="lineage, качество данных" mermaidId="e:P62-&gt;S8#0" mermaidBaseStyle="curved=1;dashed=1;dashPattern=2 3;fixDash=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.59;entryX=0;entryY=0.49;" mermaidBaseValue="lineage, качество данных" id="oGepzP1wyrvSItz7kdB5-41">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-26" source="oGepzP1wyrvSItz7kdB5-30" style="curved=1;dashed=1;dashPattern=2 3;fixDash=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.59;entryX=0;entryY=0.49;rounded=0;" target="oGepzP1wyrvSItz7kdB5-34">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1415" y="195" />
+                <mxPoint x="1721" y="195" />
+                <mxPoint x="1952" y="195" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Пациенты" mermaidId="n:PAT" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Пациенты" id="oGepzP1wyrvSItz7kdB5-42">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="99" x="-20" y="999" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Врачи" mermaidId="n:DOC" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Врачи" id="oGepzP1wyrvSItz7kdB5-43">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="69" x="-5" y="1198" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Клиенты банка" mermaidId="n:CLI" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Клиенты банка" id="oGepzP1wyrvSItz7kdB5-44">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="135" x="396" y="1591" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Бизнес-пользователи и менеджмент" mermaidId="n:USR" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Бизнес-пользователи и менеджмент" id="oGepzP1wyrvSItz7kdB5-45">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="295" x="4287" y="1399" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Регуляторы" mermaidId="n:REG" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Регуляторы" id="oGepzP1wyrvSItz7kdB5-46">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="111" x="6091" y="203" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Фармкомпании (будущее)" mermaidId="n:PH" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Фармкомпании (будущее)" id="oGepzP1wyrvSItz7kdB5-47">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="216" x="946" y="574" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Медэлектроника (будущее)" mermaidId="n:EL" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Медэлектроника (будущее)" id="oGepzP1wyrvSItz7kdB5-48">
+          <mxCell parent="oGepzP1wyrvSItz7kdB5-1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#fce7f3;strokeColor=#9d174d;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="227" x="940" y="393" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="данные приёмов" mermaidId="e:DOC-&gt;P11#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.96;" mermaidBaseValue="данные приёмов" id="oGepzP1wyrvSItz7kdB5-49">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-43" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.96;rounded=0;" target="oGepzP1wyrvSItz7kdB5-3">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="199" y="1218" />
+                <mxPoint x="319" y="1218" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="согласия, мастер-данные" mermaidId="e:PAT-&gt;P11#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.27;" mermaidBaseValue="согласия, мастер-данные" id="oGepzP1wyrvSItz7kdB5-50">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-42" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.27;rounded=0;" target="oGepzP1wyrvSItz7kdB5-3">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="199" y="1019" />
+                <mxPoint x="319" y="1019" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="анонимизированные события (без врачебной тайны)" mermaidId="e:P12-&gt;BUS#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.5;" mermaidBaseValue="анонимизированные события (без врачебной тайны)" id="oGepzP1wyrvSItz7kdB5-51">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-5" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="oGepzP1wyrvSItz7kdB5-28">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="платежи, кредитные заявки" mermaidId="e:CLI-&gt;P31#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.5;" mermaidBaseValue="платежи, кредитные заявки" id="oGepzP1wyrvSItz7kdB5-52">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-44" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.5;rounded=0;" target="oGepzP1wyrvSItz7kdB5-15">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="финансовые события, CDC" mermaidId="e:S3-&gt;BUS#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.87;exitY=0;entryX=0.23;entryY=1;" mermaidBaseValue="финансовые события, CDC" id="oGepzP1wyrvSItz7kdB5-53">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-16" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.87;exitY=0;entryX=0.23;entryY=1;rounded=0;" target="oGepzP1wyrvSItz7kdB5-28">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1876" y="1501" />
+                <mxPoint x="2098" y="1501" />
+                <mxPoint x="2320" y="1501" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="HR, инвентаризация, финотчётность" mermaidId="e:P41-&gt;BUS#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.29;exitY=0;entryX=0.61;entryY=0;" mermaidBaseValue="HR, инвентаризация, финотчётность" id="oGepzP1wyrvSItz7kdB5-54">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-22" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.29;exitY=0;entryX=0.61;entryY=0;rounded=0;" target="oGepzP1wyrvSItz7kdB5-28">
+            <mxGeometry relative="1" x="-0.0493" y="-21" as="geometry">
+              <mxPoint as="offset" />
+              <Array as="points">
+                <mxPoint x="5537" y="401" />
+                <mxPoint x="5442" y="401" />
+                <mxPoint x="5347" y="401" />
+                <mxPoint x="5122" y="401" />
+                <mxPoint x="4764" y="401" />
+                <mxPoint x="4607" y="401" />
+                <mxPoint x="4435" y="401" />
+                <mxPoint x="4262" y="401" />
+                <mxPoint x="4031" y="401" />
+                <mxPoint x="3725" y="401" />
+                <mxPoint x="3514" y="401" />
+                <mxPoint x="3377" y="401" />
+                <mxPoint x="3194" y="401" />
+                <mxPoint x="2921" y="401" />
+                <mxPoint x="2751" y="401" />
+                <mxPoint x="2671" y="401" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="НСИ препаратов, продажи" mermaidId="e:PH-&gt;P51#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.5;" mermaidBaseValue="НСИ препаратов, продажи" id="oGepzP1wyrvSItz7kdB5-55">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-47" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.51;entryX=0;entryY=0.5;rounded=0;" target="oGepzP1wyrvSItz7kdB5-25">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="телеметрия устройств" mermaidId="e:EL-&gt;P51#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.49;entryX=0;entryY=0.03;" mermaidBaseValue="телеметрия устройств" id="oGepzP1wyrvSItz7kdB5-56">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-48" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.49;entryX=0;entryY=0.03;rounded=0;" target="oGepzP1wyrvSItz7kdB5-25">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1369" y="412" />
+                <mxPoint x="1493" y="412" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="события в стандартном формате" mermaidId="e:P51-&gt;BUS#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.22;" mermaidBaseValue="события в стандартном формате" id="oGepzP1wyrvSItz7kdB5-57">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-25" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.22;rounded=0;" target="oGepzP1wyrvSItz7kdB5-28">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1876" y="594" />
+                <mxPoint x="2098" y="1079" />
+                <mxPoint x="2320" y="1079" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="запрос отчётов в пределах доступа" mermaidId="e:USR-&gt;P71#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.52;exitY=0;entryX=0;entryY=0.75;" mermaidBaseValue="запрос отчётов в пределах доступа" id="oGepzP1wyrvSItz7kdB5-58">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-45" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.52;exitY=0;entryX=0;entryY=0.75;rounded=0;" target="oGepzP1wyrvSItz7kdB5-33">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4607" y="908" />
+                <mxPoint x="4764" y="908" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="анонимизированные данные для ИИ" mermaidId="e:S6-&gt;P21#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.89;exitY=1;entryX=0.3;entryY=0;" mermaidBaseValue="анонимизированные данные для ИИ" id="oGepzP1wyrvSItz7kdB5-59">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-29" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.89;exitY=1;entryX=0.3;entryY=0;rounded=0;" target="oGepzP1wyrvSItz7kdB5-9">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="3194" y="1310" />
+                <mxPoint x="3377" y="1310" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="результаты инференса" mermaidId="e:P22-&gt;GW#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.74;" mermaidBaseValue="результаты инференса" id="oGepzP1wyrvSItz7kdB5-60">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-11" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.74;rounded=0;" target="oGepzP1wyrvSItz7kdB5-27">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4607" y="1655" />
+                <mxPoint x="4764" y="1306" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="ИИ-поддержка диагноза" mermaidId="e:GW-&gt;P11#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0;exitY=0.3;entryX=1;entryY=0.36;" mermaidBaseValue="ИИ-поддержка диагноза" id="oGepzP1wyrvSItz7kdB5-61">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-27" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0;exitY=0.3;entryX=1;entryY=0.36;rounded=0;" target="oGepzP1wyrvSItz7kdB5-3">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4764" y="991" />
+                <mxPoint x="4607" y="991" />
+                <mxPoint x="4435" y="991" />
+                <mxPoint x="4262" y="991" />
+                <mxPoint x="4031" y="991" />
+                <mxPoint x="3725" y="991" />
+                <mxPoint x="3514" y="991" />
+                <mxPoint x="3377" y="991" />
+                <mxPoint x="3194" y="991" />
+                <mxPoint x="2921" y="991" />
+                <mxPoint x="2751" y="991" />
+                <mxPoint x="2671" y="991" />
+                <mxPoint x="2496" y="991" />
+                <mxPoint x="2320" y="991" />
+                <mxPoint x="2098" y="991" />
+                <mxPoint x="1876" y="1019" />
+                <mxPoint x="1685" y="1019" />
+                <mxPoint x="1493" y="1019" />
+                <mxPoint x="1369" y="1019" />
+                <mxPoint x="1054" y="1019" />
+                <mxPoint x="837" y="1019" />
+                <mxPoint x="710" y="1019" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="API-контракты, напр. «кредит на лечение»" mermaidId="e:P31-&gt;GW#0" mermaidBaseStyle="curved=1;startArrow=block;startSize=7;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.37;entryX=0;entryY=0.65;" mermaidBaseValue="API-контракты, напр. «кредит на лечение»" id="oGepzP1wyrvSItz7kdB5-62">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-15" style="curved=1;startArrow=block;startSize=7;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.37;entryX=0;entryY=0.65;rounded=0;" target="oGepzP1wyrvSItz7kdB5-27">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1369" y="1530" />
+                <mxPoint x="1493" y="1530" />
+                <mxPoint x="1685" y="1530" />
+                <mxPoint x="1876" y="1530" />
+                <mxPoint x="2098" y="1530" />
+                <mxPoint x="2320" y="1530" />
+                <mxPoint x="2496" y="1530" />
+                <mxPoint x="2671" y="1530" />
+                <mxPoint x="2751" y="1247" />
+                <mxPoint x="2921" y="1247" />
+                <mxPoint x="3194" y="1247" />
+                <mxPoint x="3377" y="1247" />
+                <mxPoint x="3514" y="1247" />
+                <mxPoint x="3725" y="1247" />
+                <mxPoint x="4031" y="1247" />
+                <mxPoint x="4262" y="1247" />
+                <mxPoint x="4435" y="1247" />
+                <mxPoint x="4607" y="1247" />
+                <mxPoint x="4764" y="1247" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="операционные API" mermaidId="e:GW-&gt;P41#0" mermaidBaseStyle="curved=1;startArrow=block;startSize=7;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0.24;entryY=1;" mermaidBaseValue="операционные API" id="oGepzP1wyrvSItz7kdB5-63">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-27" style="curved=1;startArrow=block;startSize=7;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0.24;entryY=1;rounded=0;" target="oGepzP1wyrvSItz7kdB5-22">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="5347" y="1138" />
+                <mxPoint x="5442" y="1138" />
+                <mxPoint x="5537" y="1138" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="витрины для консолидации" mermaidId="e:S7-&gt;P42#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.63;exitY=0;entryX=0;entryY=0.5;" mermaidBaseValue="витрины для консолидации" id="oGepzP1wyrvSItz7kdB5-64">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-31" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.63;exitY=0;entryX=0;entryY=0.5;rounded=0;" target="oGepzP1wyrvSItz7kdB5-23">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4262" y="222" />
+                <mxPoint x="4435" y="222" />
+                <mxPoint x="4607" y="222" />
+                <mxPoint x="4764" y="222" />
+                <mxPoint x="5122" y="222" />
+                <mxPoint x="5347" y="222" />
+                <mxPoint x="5442" y="222" />
+                <mxPoint x="5537" y="222" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="регуляторные отчёты" mermaidId="e:P42-&gt;REG#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.49;" mermaidBaseValue="регуляторные отчёты" id="oGepzP1wyrvSItz7kdB5-65">
+          <mxCell edge="1" parent="oGepzP1wyrvSItz7kdB5-1" source="oGepzP1wyrvSItz7kdB5-23" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.49;rounded=0;" target="oGepzP1wyrvSItz7kdB5-46">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

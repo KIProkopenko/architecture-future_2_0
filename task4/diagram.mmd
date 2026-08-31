@@ -1,0 +1,57 @@
+flowchart TB
+    subgraph TF["Управляется Terraform (IaC)"]
+        NET["VPC 10.0.0.0/16"]
+        SUB1["Subnet public-platform 10.0.1.0/24"]
+        SUB2["Subnet private-platform 10.0.11.0/24"]
+        SUB3["Subnets clinics a/b 10.0.2.0/24, 10.0.12.0/24"]
+        SUB4["Subnet fintech 10.0.3.0/24"]
+        SUB5["Subnet ai 10.0.4.0/24"]
+        IGW["Internet Gateway"]
+        NAT["NAT Gateway + EIP (egress приватных подсетей)"]
+        SG1["SG public (80/443 + SSH из офиса)"]
+        SG2["SG internal (5432-9092 внутри VPC)"]
+        IP["EIP портала"]
+        VMP["EC2 portal c5.xlarge 4 vCPU 8 GB"]
+        VMA["EC2 analytics c5.2xlarge 8 vCPU 16 GB"]
+        VMI["EC2 integration c5.xlarge 4 vCPU 8 GB"]
+        D1["EBS portal-data 50 GB gp2"]
+        D2["EBS analytics-data 200 GB gp2"]
+        BKT["S3 bucket Data Lake Bronze (private)"]
+        PG["RDS PostgreSQL clinics db.t3.micro 20 GB"]
+    end
+
+    subgraph MAN["Разворачивается вручную"]
+        IAM["IAM-роли и секреты (Vault)"]
+        CI["CI/CD деплой приложений"]
+        TLS["TLS-сертификаты"]
+        DNS["DNS-записи"]
+    end
+
+    NET --> SUB1
+    NET --> SUB2
+    NET --> SUB3
+    NET --> SUB4
+    NET --> SUB5
+    IGW --> NET
+    NAT --> SUB1
+    SUB2 --> NAT
+    SUB3 --> NAT
+    SUB4 --> NAT
+    SUB5 --> NAT
+    VMP --> SUB1
+    VMA --> SUB2
+    VMI --> SUB2
+    D1 --> VMP
+    D2 --> VMA
+    IP --> VMP
+    SG1 -.-> VMP
+    SG2 -.-> VMA
+    SG2 -.-> VMI
+    SG2 -.-> PG
+    PG --> SUB3
+    BKT --> NET
+
+    IAM -.->|"учётные данные"| CI
+    CI -.->|"деплой поверх EC2"| TF
+    TLS -.-> VMP
+    DNS -.-> IP
