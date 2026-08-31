@@ -9,12 +9,11 @@ terraform {
   }
 }
 
-# Учётные данные берутся из YC CLI (~/.config/yandex-cloud/credentials)
+# Аутентификация через авторизованный ключ сервисного аккаунта terraform-sa
 provider "yandex" {
   folder_id = var.folder_id
   zone      = var.zone
 
-  # Аутентификация через ключ сервисного аккаунта
   service_account_key_file = "/home/user/key.json"
 
   # Статические ключи для Object Storage
@@ -312,19 +311,16 @@ resource "yandex_mdb_postgresql_cluster" "clinics" {
   }
 }
 
-resource "yandex_mdb_postgresql_database" "clinics_db" {
-  cluster_id = yandex_mdb_postgresql_cluster.clinics.id
-  name       = "clinics"
-  owner      = yandex_mdb_postgresql_user.clinics_app.name
-}
-
+# Пользователь создаётся до базы; блок permission не нужен:
+# владелец базы (owner ниже) автоматически получает полные права
 resource "yandex_mdb_postgresql_user" "clinics_app" {
   cluster_id = yandex_mdb_postgresql_cluster.clinics.id
   name       = "clinics_app"
   password   = var.db_password
-  
-  # Разрываем цикл: указываем имя базы жёстко строкой, а не ссылкой на ресурс
-  permission {
-    database_name = "clinics"
-  }
+}
+
+resource "yandex_mdb_postgresql_database" "clinics_db" {
+  cluster_id = yandex_mdb_postgresql_cluster.clinics.id
+  name       = "clinics"
+  owner      = yandex_mdb_postgresql_user.clinics_app.name
 }
